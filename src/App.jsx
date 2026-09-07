@@ -6,6 +6,7 @@ import Camera from './pages/Camera'
 import RiskScore from './pages/RiskScore'
 import Result from './pages/Result'
 import Settings from './pages/Settings'
+import Prevention from './pages/Prevention'
 import Login from './pages/Login'
 import { useTranslation } from 'react-i18next'
 import Icon from './components/Icon'
@@ -77,6 +78,7 @@ function App() {
           <Route path="/risk-score" element={<RiskScore />} />
           <Route path="/result" element={<Result />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/prevention" element={<Prevention />} />
         </Routes>
 
         <nav className="bottom-nav">
@@ -88,6 +90,9 @@ function App() {
           </NavLink>
           <NavLink to="/risk-score" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <Icon name="risk" className="nav-icon" />{t('risk')}
+          </NavLink>
+          <NavLink to="/prevention" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <Icon name="leaf" className="nav-icon" />{t('prevention_nav')}
           </NavLink>
           <NavLink to="/result" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <Icon name="result" className="nav-icon" />{t('result')}
