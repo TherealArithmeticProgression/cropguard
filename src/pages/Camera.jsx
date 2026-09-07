@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { savePrediction } from '../db/indexedDB'
@@ -62,13 +62,29 @@ function Camera() {
   const [pendingShot, setPendingShot] = useState(null); // shot awaiting accept/retake
   const [submitting, setSubmitting] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [cameraReady, setCameraReady] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !stream) return;
+
+    video.srcObject = stream;
+    video.play().catch(() => {
+      setCameraError(t('camera_denied'));
+    });
+
+    return () => {
+      video.pause();
+      video.srcObject = null;
+    };
+  }, [stream, t]);
 
   async function startCamera() {
     setCameraError(null);
     try {
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      setCameraReady(false);
       setStream(s);
-      if (videoRef.current) videoRef.current.srcObject = s;
     } catch (err) {
       setCameraError(t('camera_denied'));
     }
@@ -79,10 +95,12 @@ function Camera() {
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
     }
+    setCameraReady(false);
   }
 
   function capturePhoto() {
     const video = videoRef.current;
+    if (!video || !cameraReady || video.videoWidth === 0 || video.videoHeight === 0) return;
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -142,7 +160,14 @@ function Camera() {
       <p className="page-subtitle">{t('scan_subtitle')}</p>
 
       <div className="camera-preview">
-        {stream && !pendingShot && <video ref={videoRef} autoPlay playsInline />}
+        {stream && !pendingShot && (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            onLoadedMetadata={() => setCameraReady(true)}
+          />
+        )}
         {stream && !pendingShot && <div className="capture-guide" />}
         {stream && !pendingShot && <span className="shot-counter">{progressLabel}</span>}
         {pendingShot && <img src={pendingShot.dataUrl} alt="Captured leaf" />}
@@ -164,7 +189,7 @@ function Camera() {
       )}
 
       {stream && !pendingShot && (
-        <button className="btn btn-primary" onClick={capturePhoto}>
+        <button className="btn btn-primary" onClick={capturePhoto} disabled={!cameraReady}>
           {t('capture')}
         </button>
       )}
