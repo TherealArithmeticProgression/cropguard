@@ -15,12 +15,12 @@ from .views import (
 
 router = DefaultRouter()
 
-router.register("farms", FarmViewSet)
-router.register("sensors", SensorNodeViewSet)
-router.register("readings", SensorReadingViewSet)
-router.register("treatments", TreatmentRecommendationViewSet)
-router.register("predictions", DiseasePredictionViewSet)
-router.register("risk-scores", RiskScoreViewSet)
+router.register("farms", FarmViewSet, basename="farm")
+router.register("sensors", SensorNodeViewSet, basename="sensor")
+router.register("readings", SensorReadingViewSet, basename="reading")
+router.register("treatments", TreatmentRecommendationViewSet, basename="treatment")
+router.register("predictions", DiseasePredictionViewSet, basename="prediction")
+router.register("risk-scores", RiskScoreViewSet, basename="risk-score")
 
 from .auth_views import RequestOTPView, VerifyOTPView
 
