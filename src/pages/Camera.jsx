@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { savePrediction } from '../db/indexedDB'
+import { getRecentPredictions, savePrediction } from '../db/indexedDB'
 import { predictDiseaseOffline } from '../services/offlineInference'
 import Icon from '../components/Icon'
 
@@ -10,6 +10,13 @@ const TOTAL_SHOTS = 3;
 // handful of sharp vs. deliberately-blurred test photos -- retune once
 // Akshar has real field images to check this against.
 const BLUR_VARIANCE_THRESHOLD = 18;
+
+function formatTime(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('en-IN', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+  });
+}
 
 /**
  * Lightweight, dependency-free blur estimate: downsamples the frame, converts
@@ -66,6 +73,8 @@ function Camera() {
   const [cameraReady, setCameraReady] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisMessage, setAnalysisMessage] = useState('');
+  const [recentScansOpen, setRecentScansOpen] = useState(false);
+  const [recentScans, setRecentScans] = useState([]);
 
   function analysisStatus(message) {
     const messages = {
@@ -92,6 +101,10 @@ function Camera() {
       video.srcObject = null;
     };
   }, [stream, t]);
+
+  useEffect(() => {
+    if (recentScansOpen) getRecentPredictions(5).then(setRecentScans);
+  }, [recentScansOpen]);
 
   async function startCamera() {
     setCameraError(null);
@@ -183,6 +196,39 @@ function Camera() {
     <div className="page page-enter">
       <h1>{t('scan_title')}</h1>
       <p className="page-subtitle">{t('scan_subtitle')}</p>
+
+      <button
+        className="scan-history-toggle"
+        type="button"
+        aria-expanded={recentScansOpen}
+        onClick={() => setRecentScansOpen((open) => !open)}
+      >
+        <span><Icon name="clock" size={17} /> {t('recent_scans')}</span>
+        <Icon name={recentScansOpen ? 'plus' : 'plus'} size={17} className={recentScansOpen ? 'rotate-45' : ''} />
+      </button>
+
+      {recentScansOpen && (
+        <div className="scan-history card">
+          {recentScans.length === 0 && (
+            <div className="empty-state">
+              <Icon name="leaf" className="empty-icon" size={34} />
+              <p>{t('no_scans_yet')}</p>
+            </div>
+          )}
+          {recentScans.map((scan) => (
+            <div className="list-row" key={scan.clientId}>
+              <img className="list-thumb" src={scan.image} alt="" />
+              <div style={{ flex: 1 }}>
+                <div className="scan-history-name">{scan.diseaseLabel ? t(`disease_${scan.diseaseLabel}`, { defaultValue: scan.diseaseLabel }) : t('analysis_pending')}</div>
+                <div className="scan-history-time">{formatTime(scan.createdAt)}</div>
+              </div>
+              <span className={`status-pill ${scan.syncStatus === 'synced' || scan.syncStatus === 'offline' ? 'status-synced' : 'status-pending'}`}>
+                <Icon name={scan.syncStatus === 'synced' || scan.syncStatus === 'offline' ? 'check' : 'clock'} size={15} />
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="camera-preview">
         {stream && !pendingShot && (

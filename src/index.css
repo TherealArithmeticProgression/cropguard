@@ -110,6 +110,37 @@ button, input, select {
   letter-spacing: -0.02em;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.language-control select {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  min-height: 32px;
+  padding: 0 0.45rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .offline-pill {
   color: var(--vine);
   font-size: 0.75rem;
@@ -140,6 +171,50 @@ button, input, select {
   font-size: 1rem;
   line-height: 1.35;
   margin-bottom: 1.5rem;
+}
+
+.scan-history-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink);
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.8rem;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scan-history-toggle span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.scan-history-toggle:hover {
+  background: var(--surface-alt);
+}
+
+.rotate-45 {
+  transform: rotate(45deg);
+}
+
+.scan-history {
+  padding-top: 0.55rem;
+}
+
+.scan-history-name {
+  font-size: 0.9rem;
+}
+
+.scan-history-time {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
 }
 
 /* Generic card — used for secondary/quiet content, not everything */

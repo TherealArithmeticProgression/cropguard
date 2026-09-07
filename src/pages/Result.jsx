@@ -92,7 +92,9 @@ function Result() {
 
       <div className="card">
         <div className="card-label">{t('detected_disease')}</div>
-        <h2 style={{ color: 'var(--vine)', margin: '0.3rem 0' }}>{prediction.diseaseLabel}</h2>
+        <h2 style={{ color: 'var(--vine)', margin: '0.3rem 0' }}>
+          {t(`disease_${prediction.diseaseLabel}`, { defaultValue: prediction.diseaseLabel })}
+        </h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
           <div className="confidence-track">
             <div className="confidence-fill" style={{ width: `${prediction.confidence}%`, background: fillColor }} />

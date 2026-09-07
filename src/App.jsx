@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { addSensorData } from './db/indexedDB'
+import { addSensorData, setPreference } from './db/indexedDB'
 import Home from './pages/Home'
 import Camera from './pages/Camera'
 import RiskScore from './pages/RiskScore'
@@ -11,11 +11,17 @@ import { useTranslation } from 'react-i18next'
 import Icon from './components/Icon'
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // An offline-first app that never tells the farmer whether it's actually
   // online is hiding the one piece of state that most affects what they
   // should expect from it -- this was entirely missing before.
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  async function selectLanguage(event) {
+    const language = event.target.value;
+    await i18n.changeLanguage(language);
+    await setPreference('userLang', language);
+  }
 
   useEffect(() => {
     const goOnline = () => setIsOnline(true);
@@ -48,8 +54,20 @@ function App() {
     <BrowserRouter>
       <div className="app-shell">
         <div className="topbar">
-          <div className="topbar-title"><Icon name="brand" size={25} /> CropGuard</div>
-          <span className="offline-pill">{isOnline ? t('online') : t('offline')}</span>
+          <div className="topbar-title"><Icon name="brand" size={25} /> {t('brand_name')}</div>
+          <div className="topbar-actions">
+            <label className="language-control">
+              <span className="sr-only">{t('language')}</span>
+              <select value={i18n.language} onChange={selectLanguage} aria-label={t('language')}>
+                <option value="en">EN</option>
+                <option value="hi">हि</option>
+                <option value="pa">ਪੰ</option>
+                <option value="bn">বা</option>
+                <option value="ta">த</option>
+              </select>
+            </label>
+            <span className="offline-pill">{isOnline ? t('online') : t('offline')}</span>
+          </div>
         </div>
 
         <Routes>

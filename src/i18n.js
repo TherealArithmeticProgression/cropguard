@@ -12,6 +12,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
+      brand_name: "CropGuard",
       login_title: "Login with Voice",
       phone_number: "Phone Number",
       otp: "OTP",
@@ -97,10 +98,15 @@ const resources = {
 
       offline: "Offline",
       online: "Online",
+      disease_bacterial_spot: "Bacterial leaf spot",
+      disease_early_blight: "Early blight",
+      disease_late_blight: "Late blight",
+      disease_septoria_leaf_spot: "Septoria leaf spot",
     }
   },
   hi: {
     translation: {
+      brand_name: "क्रॉपगार्ड",
       login_title: "आवाज़ से लॉगिन करें",
       phone_number: "फ़ोन नंबर",
       otp: "ओटीपी",
@@ -181,10 +187,15 @@ const resources = {
 
       offline: "ऑफ़लाइन",
       online: "ऑनलाइन",
+      disease_bacterial_spot: "बैक्टीरियल लीफ स्पॉट",
+      disease_early_blight: "अर्ली ब्लाइट",
+      disease_late_blight: "लेट ब्लाइट",
+      disease_septoria_leaf_spot: "सेप्टोरिया लीफ स्पॉट",
     }
   },
   pa: {
     translation: {
+      brand_name: "ਕ੍ਰੌਪਗਾਰਡ",
       login_title: "ਆਵਾਜ਼ ਨਾਲ ਲਾਗਇਨ ਕਰੋ",
       phone_number: "ਫੋਨ ਨੰਬਰ",
       otp: "ਓ.ਟੀ.ਪੀ.",
@@ -265,10 +276,15 @@ const resources = {
 
       offline: "ਆਫਲਾਈਨ",
       online: "ਆਨਲਾਈਨ",
+      disease_bacterial_spot: "ਬੈਕਟੀਰੀਅਲ ਲੀਫ਼ ਸਪੌਟ",
+      disease_early_blight: "ਅਰਲੀ ਬਲਾਈਟ",
+      disease_late_blight: "ਲੇਟ ਬਲਾਈਟ",
+      disease_septoria_leaf_spot: "ਸੈਪਟੋਰੀਆ ਲੀਫ਼ ਸਪੌਟ",
     }
   },
   bn: {
     translation: {
+      brand_name: "ক্রপগার্ড",
       login_title: "ভয়েস দিয়ে লগইন করুন",
       phone_number: "ফোন নম্বর",
       otp: "ওটিপি",
@@ -349,10 +365,15 @@ const resources = {
 
       offline: "অফলাইন",
       online: "অনলাইন",
+      disease_bacterial_spot: "ব্যাকটেরিয়াল লিফ স্পট",
+      disease_early_blight: "আর্লি ব্লাইট",
+      disease_late_blight: "লেট ব্লাইট",
+      disease_septoria_leaf_spot: "সেপ্টোরিয়া লিফ স্পট",
     }
   },
   ta: {
     translation: {
+      brand_name: "கிராப்கார்ட்",
       login_title: "குரல் மூலம் உள்நுழையவும்",
       phone_number: "தொலைபேசி எண்",
       otp: "OTP",
@@ -433,6 +454,10 @@ const resources = {
 
       offline: "இணையமில்லை",
       online: "இணையத்தில்",
+      disease_bacterial_spot: "பாக்டீரியல் இலைப் புள்ளி",
+      disease_early_blight: "ஆரம்ப இலைக்கருகல்",
+      disease_late_blight: "தாமத இலைக்கருகல்",
+      disease_septoria_leaf_spot: "செப்டோரியா இலைப் புள்ளி",
     }
   }
 };

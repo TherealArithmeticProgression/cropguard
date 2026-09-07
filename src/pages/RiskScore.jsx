@@ -104,7 +104,7 @@ function RiskScore() {
       {riskScores.map((r) => (
         <div key={r.disease} className="disease-row" onClick={() => setExpanded(expanded === r.disease ? null : r.disease)}>
           <div className="disease-row-head">
-            <span className="disease-name">{r.disease}</span>
+            <span className="disease-name">{t(`disease_${r.disease}`, { defaultValue: r.disease })}</span>
             <span
               className="disease-score-badge"
               style={{ background: BAND_COLOR[r.band] + '22', color: BAND_COLOR[r.band] }}
