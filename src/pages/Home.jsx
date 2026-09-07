@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getRecentPredictions, getPendingPredictions, getCachedRiskScores } from '../db/indexedDB'
+import Icon from '../components/Icon'
 
 const BAND_ORDER = { low: 0, moderate: 1, high: 2, critical: 3 };
 
@@ -49,7 +50,7 @@ function Home() {
   }, []);
 
   const bandClass = topRisk ? `level-${topRisk.band}` : 'level-low';
-  const bandIcon = { low: '✅', moderate: '👀', high: '⚠️', critical: '🚨' }[topRisk?.band] || '✅';
+  const bandIcon = { low: 'check', moderate: 'eye', high: 'alert', critical: 'alert' }[topRisk?.band] || 'check';
 
   return (
     <div className="page page-enter">
@@ -57,7 +58,7 @@ function Home() {
       <p className="page-subtitle">{t('home_subtitle')}</p>
 
       <div className={`alert-banner ${bandClass}`}>
-        <span className="alert-icon">{bandIcon}</span>
+        <Icon name={bandIcon} className="alert-icon" size={22} />
         <div>
           <div className="alert-title">
             {topRisk && BAND_ORDER[topRisk.band] >= 2
@@ -74,7 +75,7 @@ function Home() {
         <div className="card">
           <div className="card-label">{t('recent_scans')}</div>
           <span className="status-pill status-pending pulse">
-            ⏳ {pendingCount === 1 ? t('pending_sync_one') : t('pending_sync_many', { count: pendingCount })}
+            <Icon name="clock" size={15} /> {pendingCount === 1 ? t('pending_sync_one') : t('pending_sync_many', { count: pendingCount })}
           </span>
         </div>
       )}
@@ -86,7 +87,7 @@ function Home() {
 
         {!loading && scans.length === 0 && (
           <div className="empty-state">
-            <div className="empty-icon">🌱</div>
+            <Icon name="leaf" className="empty-icon" size={34} />
             <p>{t('no_scans_yet')}</p>
           </div>
         )}
@@ -98,8 +99,8 @@ function Home() {
               <div style={{ fontSize: '0.9rem' }}>{scan.diseaseLabel || t('analysis_pending')}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)' }}>{formatTime(scan.createdAt)}</div>
             </div>
-            <span className={`status-pill ${scan.syncStatus === 'synced' ? 'status-synced' : 'status-pending'}`}>
-              {scan.syncStatus === 'synced' ? `✓` : `⏳`}
+            <span className={`status-pill ${scan.syncStatus === 'synced' || scan.syncStatus === 'offline' ? 'status-synced' : 'status-pending'}`}>
+              <Icon name={scan.syncStatus === 'synced' ? 'check' : 'clock'} size={15} />
             </span>
           </div>
         ))}
@@ -107,7 +108,7 @@ function Home() {
 
       {!loading && scans.length === 0 && (
         <Link to="/camera" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-          📷 {t('first_scan_cta')}
+          <Icon name="camera" size={19} /> {t('first_scan_cta')}
         </Link>
       )}
     </div>

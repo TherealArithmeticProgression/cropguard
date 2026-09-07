@@ -23,27 +23,6 @@ export async function verifyOtp(phone_number, otp, language) {
   return session;
 }
 
-// --- New exports, matching the image-prediction and risk-score contracts
-//     from the team's implementation plan ---
-
-/**
- * Sends an image (data URL or Blob) for disease classification.
- * Matches the contract: image + optional metadata in, { label, confidence,
- * top_three, recommended_action } out. Throws on network failure -- the
- * caller is responsible for queuing the prediction locally when offline.
- */
-export async function predictDisease(imageDataUrlOrBlob, metadata = {}) {
-  const formData = new FormData();
-  if (typeof imageDataUrlOrBlob === 'string' && imageDataUrlOrBlob.startsWith('data:')) {
-    const blob = await (await fetch(imageDataUrlOrBlob)).blob();
-    formData.append('image', blob, 'leaf.jpg');
-  } else {
-    formData.append('image', imageDataUrlOrBlob, 'leaf.jpg');
-  }
-  Object.entries(metadata).forEach(([key, value]) => formData.append(key, value));
-  return api('/predict/', { method: 'POST', body: formData });
-}
-
 /**
  * Fetches the current multi-disease risk scores for a farm. Returns an array
  * of { disease, score, band, explanation } matching risk_engine.py's

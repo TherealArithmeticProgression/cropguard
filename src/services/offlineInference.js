@@ -52,6 +52,12 @@ function softmax(values) {
   return exponentials.map((value) => value / total);
 }
 
+function probabilitiesFromOutput(values) {
+  const total = values.reduce((sum, value) => sum + value, 0);
+  const looksLikeProbabilities = values.every((value) => value >= 0 && value <= 1) && Math.abs(total - 1) < 0.02;
+  return looksLikeProbabilities ? values : softmax(values);
+}
+
 async function getSession() {
   if (!sessionPromise) {
     sessionPromise = ort.InferenceSession.create(MODEL_URL, {
@@ -61,29 +67,39 @@ async function getSession() {
   return sessionPromise;
 }
 
-export async function predictDiseaseOffline(dataUrl, onProgress = () => {}) {
+export async function predictDiseaseOffline(dataUrls, onProgress = () => {}) {
+  const images = Array.isArray(dataUrls) ? dataUrls : [dataUrls];
   onProgress(5, 'Loading the offline model');
   const session = await getSession();
-
-  onProgress(20, 'Preparing the leaf image');
-  const image = await loadImage(dataUrl);
-  const input = imageToTensor(image);
   const inputName = session.inputNames[0];
 
-  onProgress(35, 'Reading leaf features');
-  const output = await session.run({ [inputName]: input });
-  const outputTensor = output[session.outputNames[0]];
-  const scores = Array.from(outputTensor.data).slice(0, CLASS_NAMES.length);
-  const probabilities = softmax(scores);
+  const predictions = [];
+  for (let index = 0; index < images.length; index += 1) {
+    onProgress(20 + Math.round((index / images.length) * 55), 'Preparing the leaf image');
+    const image = await loadImage(images[index]);
+    const input = imageToTensor(image);
+    onProgress(25 + Math.round((index / images.length) * 55), 'Reading leaf features');
+    const output = await session.run({ [inputName]: input });
+    const outputTensor = output[session.outputNames[0]];
+    const scores = Array.from(outputTensor.data).slice(0, CLASS_NAMES.length);
+    if (scores.length !== CLASS_NAMES.length || scores.some((score) => !Number.isFinite(score))) {
+      throw new Error('The offline model returned an unexpected result.');
+    }
+    predictions.push(probabilitiesFromOutput(scores));
+  }
+
+  const probabilities = CLASS_NAMES.map((_, classIndex) => (
+    predictions.reduce((sum, prediction) => sum + prediction[classIndex], 0) / predictions.length
+  ));
   const ranked = probabilities
     .map((confidence, index) => ({
       label: CLASS_NAMES[index],
-      confidence: Math.round(confidence * 100),
+      confidence: Math.round(Math.max(0, Math.min(1, confidence)) * 100),
     }))
     .sort((a, b) => b.confidence - a.confidence);
   const best = ranked[0];
 
-  onProgress(85, 'Checking the model result');
+  onProgress(90, 'Checking the model result');
   await new Promise((resolve) => setTimeout(resolve, 120));
   onProgress(100, 'Analysis complete');
 

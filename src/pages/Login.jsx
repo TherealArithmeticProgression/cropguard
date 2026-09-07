@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { setPreference } from '../db/indexedDB';
 import { requestOtp, verifyOtp } from '../services/api';
 import { SUPPORTED_LANGUAGES } from '../i18n';
+import Icon from '../components/Icon';
 
 export default function Login() {
   const { t, i18n } = useTranslation();
@@ -117,7 +118,7 @@ export default function Login() {
             aria-label={t('start_voice')}
             style={isListening && activeField === 'phone' ? { background: 'var(--tomato-soft)', color: 'var(--tomato)' } : undefined}
           >
-            🎤
+            <Icon name="microphone" size={20} />
           </button>
         </div>
         <button
@@ -146,7 +147,7 @@ export default function Login() {
               aria-label={t('start_voice')}
               style={isListening && activeField === 'otp' ? { background: 'var(--tomato-soft)', color: 'var(--tomato)' } : undefined}
             >
-              🎤
+              <Icon name="microphone" size={20} />
             </button>
           </div>
         </div>

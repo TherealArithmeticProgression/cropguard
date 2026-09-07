@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCachedRiskScores, saveRiskScores, addSensorData, getPreference } from '../db/indexedDB';
 import { fetchRiskScores } from '../services/api';
+import Icon from '../components/Icon';
 
 // Preserved exactly -- must match the ESP32 firmware's advertised service.
 const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
@@ -95,7 +96,7 @@ function RiskScore() {
 
       {riskScores.length === 0 && (
         <div className="empty-state">
-          <div className="empty-icon">📡</div>
+          <Icon name="sensor" className="empty-icon" size={34} />
           <p>{t('no_sensor_data')}</p>
         </div>
       )}
@@ -120,20 +121,20 @@ function RiskScore() {
       <div className="card" style={{ marginTop: '1rem' }}>
         <div className="card-label">{t('connect_sensor')}</div>
         <button className="btn btn-secondary" style={{ width: '100%', marginTop: '0.5rem' }} onClick={connectToNode}>
-          📡 {t('connect_sensor')}
+          <Icon name="sensor" size={19} /> {t('connect_sensor')}
         </button>
         {statusText && <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--ink-muted)' }}>{statusText}</p>}
 
         {temperature != null && (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.8rem' }}>
-              <span>🌡️ {t('sensor_temp')}</span><strong>{temperature}°C</strong>
+              <span><Icon name="thermometer" size={17} /> {t('sensor_temp')}</span><strong>{temperature}°C</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem' }}>
-              <span>💧 {t('sensor_humidity')}</span><strong>{humidity}%</strong>
+              <span><Icon name="droplet" size={17} /> {t('sensor_humidity')}</span><strong>{humidity}%</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem' }}>
-              <span>🌱 {t('sensor_moisture')}</span><strong>{moisture}</strong>
+              <span><Icon name="leaf" size={17} /> {t('sensor_moisture')}</span><strong>{moisture}</strong>
             </div>
             {localEstimate != null && (
               <p style={{ marginTop: '0.6rem', fontSize: '0.8rem', color: 'var(--ink-muted)' }}>

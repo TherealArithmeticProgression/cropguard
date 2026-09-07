@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getRecentPredictions, savePrediction } from '../db/indexedDB'
 import { submitPredictionFeedback } from '../services/api'
+import Icon from '../components/Icon'
 
 // Thresholds mirror the confidence-handling design from the team's plan:
 // high -> show the answer directly, medium -> show it plus alternatives,
@@ -47,7 +48,7 @@ function Result() {
       <div className="page page-enter">
         <h1>{t('result_title')}</h1>
         <div className="empty-state">
-          <div className="empty-icon">📋</div>
+          <Icon name="result" className="empty-icon" size={34} />
           <p>{t('no_result_title')}</p>
           <p style={{ marginTop: '0.4rem' }}>{t('no_result_body')}</p>
         </div>
@@ -65,27 +66,9 @@ function Result() {
       <div className="page page-enter">
         <h1>{t('result_title')}</h1>
         <div className="card">
-          <span className="status-pill status-pending pulse">⏳ {t('analysis_pending')}</span>
+          <span className="status-pill status-pending pulse"><Icon name="clock" size={14} /> {t('analysis_pending')}</span>
           <p style={{ marginTop: '0.6rem', color: 'var(--ink-muted)' }}>{t('saved_pending')}</p>
         </div>
-      </div>
-    );
-  }
-
-  if (tier === 'low') {
-    return (
-      <div className="page page-enter">
-        <h1>{t('result_title')}</h1>
-        <div className="alert-banner level-moderate">
-          <span className="alert-icon">🔍</span>
-          <div>
-            <div className="alert-title">{t('low_confidence_title')}</div>
-            <div className="alert-body">{t('low_confidence_body')}</div>
-          </div>
-        </div>
-        <Link to="/camera" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-          {t('go_to_scan')}
-        </Link>
       </div>
     );
   }
@@ -96,6 +79,16 @@ function Result() {
     <div className="page page-enter">
       <h1>{t('result_title')}</h1>
       <p className="page-subtitle">{t('result_subtitle')}</p>
+
+      {tier === 'low' && (
+        <div className="alert-banner level-moderate">
+          <Icon name="search" className="alert-icon" size={22} />
+          <div>
+            <div className="alert-title">{t('low_confidence_title')}</div>
+            <div className="alert-body">{t('low_confidence_body')}</div>
+          </div>
+        </div>
+      )}
 
       <div className="card">
         <div className="card-label">{t('detected_disease')}</div>
@@ -127,10 +120,10 @@ function Result() {
       {!feedbackGiven ? (
         <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1rem' }}>
           <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => giveFeedback(true)}>
-            👍 {t('correct')}
+            <Icon name="thumbsUp" size={18} /> {t('correct')}
           </button>
           <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => giveFeedback(false)}>
-            👎 {t('incorrect')}
+            <Icon name="thumbsDown" size={18} /> {t('incorrect')}
           </button>
         </div>
       ) : (

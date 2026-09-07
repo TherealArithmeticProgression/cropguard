@@ -8,6 +8,7 @@ import Result from './pages/Result'
 import Settings from './pages/Settings'
 import Login from './pages/Login'
 import { useTranslation } from 'react-i18next'
+import Icon from './components/Icon'
 
 function App() {
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ function App() {
     <BrowserRouter>
       <div className="app-shell">
         <div className="topbar">
-          <div className="topbar-title">🌿 CropGuard</div>
+          <div className="topbar-title"><Icon name="brand" size={25} /> CropGuard</div>
           <span className="offline-pill">{isOnline ? t('online') : t('offline')}</span>
         </div>
 
@@ -62,19 +63,19 @@ function App() {
 
         <nav className="bottom-nav">
           <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-icon">🏠</span>{t('home')}
+            <Icon name="home" className="nav-icon" />{t('home')}
           </NavLink>
           <NavLink to="/camera" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-icon">📷</span>{t('scan')}
+            <Icon name="scan" className="nav-icon" />{t('scan')}
           </NavLink>
           <NavLink to="/risk-score" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-icon">⚠️</span>{t('risk')}
+            <Icon name="risk" className="nav-icon" />{t('risk')}
           </NavLink>
           <NavLink to="/result" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-icon">📋</span>{t('result')}
+            <Icon name="result" className="nav-icon" />{t('result')}
           </NavLink>
           <NavLink to="/settings" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <span className="nav-icon">⚙️</span>{t('settings')}
+            <Icon name="settings" className="nav-icon" />{t('settings')}
           </NavLink>
         </nav>
       </div>

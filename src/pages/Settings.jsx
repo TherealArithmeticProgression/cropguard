@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { setPreference, getPreference, getPendingPredictions } from '../db/indexedDB'
 import { SUPPORTED_LANGUAGES } from '../i18n'
+import Icon from '../components/Icon'
 
 function Settings() {
   const { t, i18n } = useTranslation();
@@ -31,7 +32,7 @@ function Settings() {
         {SUPPORTED_LANGUAGES.map((lang) => (
           <div key={lang.code} className="option-row" onClick={() => selectLanguage(lang.code)}>
             <span>{lang.label}</span>
-            {language === lang.code && <span style={{ color: 'var(--vine)' }}>✓</span>}
+            {language === lang.code && <Icon name="check" size={18} />}
           </div>
         ))}
       </div>
@@ -40,7 +41,7 @@ function Settings() {
         <div className="card">
           <div className="card-label">{t('recent_scans')}</div>
           <span className="status-pill status-pending pulse">
-            ⏳ {pendingCount === 1 ? t('pending_sync_one') : t('pending_sync_many', { count: pendingCount })}
+            <Icon name="clock" size={15} /> {pendingCount === 1 ? t('pending_sync_one') : t('pending_sync_many', { count: pendingCount })}
           </span>
         </div>
       )}

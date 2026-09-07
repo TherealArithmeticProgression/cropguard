@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { savePrediction } from '../db/indexedDB'
 import { predictDiseaseOffline } from '../services/offlineInference'
+import Icon from '../components/Icon'
 
 const TOTAL_SHOTS = 3;
 // Below this, a shot is flagged as likely blurry. Tuned by eye against a
@@ -150,7 +151,7 @@ function Camera() {
     });
 
     try {
-      const result = await predictDiseaseOffline(allShots[0].dataUrl, (progress, message) => {
+      const result = await predictDiseaseOffline(allShots.map((shot) => shot.dataUrl), (progress, message) => {
         setAnalysisProgress(progress);
         setAnalysisMessage(analysisStatus(message));
       });
@@ -208,7 +209,7 @@ function Camera() {
 
       {!stream && !pendingShot && shots.length === 0 && (
         <button className="btn btn-primary" onClick={startCamera}>
-          📷 {t('open_camera')}
+          <Icon name="camera" size={19} /> {t('open_camera')}
         </button>
       )}
 
@@ -235,7 +236,7 @@ function Camera() {
 
       {!stream && !pendingShot && shots.length > 0 && shots.length < TOTAL_SHOTS && (
         <button className="btn btn-primary" onClick={startCamera}>
-          📷 {t('open_camera')}
+          <Icon name="camera" size={19} /> {t('open_camera')}
         </button>
       )}
 
@@ -247,7 +248,7 @@ function Camera() {
 
       {submitting && (
         <div className="card">
-          <span className="status-pill status-pending pulse">⏳ {analysisProgress}/100%</span>
+          <span className="status-pill status-pending pulse"><Icon name="clock" size={14} /> {analysisProgress}/100%</span>
           <p style={{ marginTop: '0.6rem' }}>{analysisMessage}</p>
           <div className="confidence-track" style={{ marginTop: '0.8rem' }}>
             <div className="confidence-fill" style={{ width: `${analysisProgress}%`, background: 'var(--vine)' }} />
