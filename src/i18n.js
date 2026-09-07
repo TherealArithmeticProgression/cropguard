@@ -51,6 +51,11 @@ const resources = {
       retake_suggested: "Retake photo",
       use_anyway: "Use it anyway",
       saved_pending: "Saved. It'll be analyzed once you're back online.",
+      analysis_loading_model: "Loading the offline model",
+      analysis_preparing_image: "Preparing the leaf image",
+      analysis_reading_features: "Reading leaf features",
+      analysis_checking_result: "Checking the model result",
+      analysis_complete: "Analysis complete",
       scan_again: "Scan another leaf",
       camera_denied: "Couldn't access the camera. Check your browser permissions.",
 

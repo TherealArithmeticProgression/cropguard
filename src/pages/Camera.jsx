@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { savePrediction } from '../db/indexedDB'
-import { predictDisease } from '../services/api'
+import { predictDiseaseOffline } from '../services/offlineInference'
 
 const TOTAL_SHOTS = 3;
 // Below this, a shot is flagged as likely blurry. Tuned by eye against a
@@ -63,6 +63,19 @@ function Camera() {
   const [submitting, setSubmitting] = useState(false);
   const [cameraError, setCameraError] = useState(null);
   const [cameraReady, setCameraReady] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [analysisMessage, setAnalysisMessage] = useState('');
+
+  function analysisStatus(message) {
+    const messages = {
+      'Loading the offline model': t('analysis_loading_model'),
+      'Preparing the leaf image': t('analysis_preparing_image'),
+      'Reading leaf features': t('analysis_reading_features'),
+      'Checking the model result': t('analysis_checking_result'),
+      'Analysis complete': t('analysis_complete'),
+    };
+    return messages[message] || message;
+  }
 
   useEffect(() => {
     const video = videoRef.current;
@@ -127,6 +140,8 @@ function Camera() {
 
   async function finalizeShots(allShots) {
     setSubmitting(true);
+    setAnalysisProgress(5);
+    setAnalysisMessage(t('analysis_loading_model'));
     const record = await savePrediction({
       image: allShots[0].dataUrl,
       shotCount: allShots.length,
@@ -135,11 +150,20 @@ function Camera() {
     });
 
     try {
-      const result = await predictDisease(allShots[0].dataUrl, { shot_count: allShots.length });
-      await savePrediction({ ...record, ...result, syncStatus: 'synced' });
-    } catch {
-      // Offline or backend unreachable -- record stays 'pending', App-level
-      // sync logic (or a future background sync) will retry it later.
+      const result = await predictDiseaseOffline(allShots[0].dataUrl, (progress, message) => {
+        setAnalysisProgress(progress);
+        setAnalysisMessage(analysisStatus(message));
+      });
+      await savePrediction({ ...record, ...result });
+    } catch (error) {
+      await savePrediction({
+        ...record,
+        syncStatus: 'failed',
+        analysisError: error.message,
+      });
+      setCameraError(error.message);
+      setSubmitting(false);
+      return;
     }
 
     setSubmitting(false);
@@ -223,8 +247,11 @@ function Camera() {
 
       {submitting && (
         <div className="card">
-          <span className="status-pill status-pending pulse">⏳</span>
-          <p style={{ marginTop: '0.6rem' }}>{t('saved_pending')}</p>
+          <span className="status-pill status-pending pulse">⏳ {analysisProgress}/100%</span>
+          <p style={{ marginTop: '0.6rem' }}>{analysisMessage}</p>
+          <div className="confidence-track" style={{ marginTop: '0.8rem' }}>
+            <div className="confidence-fill" style={{ width: `${analysisProgress}%`, background: 'var(--vine)' }} />
+          </div>
         </div>
       )}
 
