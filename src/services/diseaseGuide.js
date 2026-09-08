@@ -12,6 +12,13 @@ const sourceByLanguage = {
   ta: tamilGuide,
 };
 
+const diseaseSectionIndex = {
+  septoria_leaf_spot: 0,
+  early_blight: 1,
+  bacterial_spot: 2,
+  late_blight: 3,
+};
+
 function cleanMarkdown(value) {
   return value
     .replace(/^\*\*(.+?)\*\*:?\s*/, '$1: ')
@@ -87,4 +94,11 @@ function parseGuide(markdown) {
 
 export function getDiseaseGuide(language) {
   return parseGuide(sourceByLanguage[language] || sourceByLanguage.en);
+}
+
+export function getDiseaseTreatment(language, diseaseLabel) {
+  const sectionIndex = diseaseSectionIndex[diseaseLabel];
+  if (sectionIndex == null) return '';
+  const section = getDiseaseGuide(language).sections[sectionIndex];
+  return section?.actions.at(-1) || '';
 }

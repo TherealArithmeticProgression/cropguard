@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getRecentPredictions, savePrediction } from '../db/indexedDB'
 import { submitPredictionFeedback } from '../services/api'
+import { getDiseaseTreatment } from '../services/diseaseGuide'
 import Icon from '../components/Icon'
 
 // Thresholds mirror the confidence-handling design from the team's plan:
@@ -16,7 +17,7 @@ function confidenceTier(confidence) {
 }
 
 function Result() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
@@ -74,6 +75,7 @@ function Result() {
   }
 
   const fillColor = tier === 'high' ? 'var(--leaf)' : 'var(--turmeric)';
+  const localizedTreatment = getDiseaseTreatment(i18n.language, prediction.diseaseLabel) || prediction.treatment;
 
   return (
     <div className="page page-enter">
@@ -116,7 +118,7 @@ function Result() {
 
       <div className="card">
         <div className="card-label">{t('recommended_treatment')}</div>
-        <p style={{ marginTop: '0.4rem' }}>{prediction.treatment}</p>
+        <p style={{ marginTop: '0.4rem' }}>{localizedTreatment}</p>
       </div>
 
       {!feedbackGiven ? (
