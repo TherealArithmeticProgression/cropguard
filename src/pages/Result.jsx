@@ -6,16 +6,6 @@ import { submitPredictionFeedback } from '../services/api'
 import { getDiseaseTreatment } from '../services/diseaseGuide'
 import Icon from '../components/Icon'
 
-// Thresholds mirror the confidence-handling design from the team's plan:
-// high -> show the answer directly, medium -> show it plus alternatives,
-// low -> don't assert a diagnosis at all.
-function confidenceTier(confidence) {
-  if (confidence == null) return 'unknown';
-  if (confidence >= 75) return 'high';
-  if (confidence >= 45) return 'medium';
-  return 'low';
-}
-
 function Result() {
   const { t, i18n } = useTranslation();
   const [prediction, setPrediction] = useState(null);
@@ -60,9 +50,7 @@ function Result() {
     );
   }
 
-  const tier = confidenceTier(prediction.confidence);
-
-  if (tier === 'unknown') {
+  if (prediction.confidence == null) {
     return (
       <div className="page page-enter">
         <h1>{t('result_title')}</h1>
@@ -74,7 +62,6 @@ function Result() {
     );
   }
 
-  const fillColor = tier === 'high' ? 'var(--leaf)' : 'var(--turmeric)';
   const localizedTreatment = getDiseaseTreatment(i18n.language, prediction.diseaseLabel) || prediction.treatment;
 
   return (
@@ -82,38 +69,11 @@ function Result() {
       <h1>{t('result_title')}</h1>
       <p className="page-subtitle">{t('result_subtitle')}</p>
 
-      {tier === 'low' && (
-        <div className="alert-banner level-moderate">
-          <Icon name="search" className="alert-icon" size={22} />
-          <div>
-            <div className="alert-title">{t('low_confidence_title')}</div>
-            <div className="alert-body">{t('low_confidence_body')}</div>
-          </div>
-        </div>
-      )}
-
       <div className="card">
         <div className="card-label">{t('detected_disease')}</div>
         <h2 style={{ color: 'var(--vine)', margin: '0.3rem 0' }}>
           {t(`disease_${prediction.diseaseLabel}`, { defaultValue: prediction.diseaseLabel })}
         </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-          <div className="confidence-track">
-            <div className="confidence-fill" style={{ width: `${prediction.confidence}%`, background: fillColor }} />
-          </div>
-          <strong style={{ fontSize: '0.9rem' }}>{prediction.confidence}%</strong>
-        </div>
-
-        {tier === 'medium' && Array.isArray(prediction.topThree) && (
-          <div style={{ marginTop: '0.8rem' }}>
-            <div className="card-label">{t('medium_confidence_note')}</div>
-            {prediction.topThree.map((alt) => (
-              <div key={alt.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', padding: '0.2rem 0' }}>
-                <span>{alt.label}</span><span>{alt.confidence}%</span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       <div className="card">
