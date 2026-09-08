@@ -224,10 +224,10 @@ const resources = {
 
       offline: "ऑफ़लाइन",
       online: "ऑनलाइन",
-      disease_bacterial_spot: "बैक्टीरियल लीफ स्पॉट",
-      disease_early_blight: "अर्ली ब्लाइट",
-      disease_late_blight: "लेट ब्लाइट",
-      disease_septoria_leaf_spot: "सेप्टोरिया लीफ स्पॉट",
+      disease_bacterial_spot: "पत्तियों का जीवाणु धब्बा रोग",
+      disease_early_blight: "शुरुआती झुलसा रोग",
+      disease_late_blight: "पछेती झुलसा रोग",
+      disease_septoria_leaf_spot: "सेप्टोरिया धब्बा रोग",
     }
   },
   pa: {
@@ -334,10 +334,10 @@ const resources = {
 
       offline: "ਆਫਲਾਈਨ",
       online: "ਆਨਲਾਈਨ",
-      disease_bacterial_spot: "ਬੈਕਟੀਰੀਅਲ ਲੀਫ਼ ਸਪੌਟ",
-      disease_early_blight: "ਅਰਲੀ ਬਲਾਈਟ",
-      disease_late_blight: "ਲੇਟ ਬਲਾਈਟ",
-      disease_septoria_leaf_spot: "ਸੈਪਟੋਰੀਆ ਲੀਫ਼ ਸਪੌਟ",
+      disease_bacterial_spot: "ਪੱਤਿਆਂ ਉੱਤੇ ਬੈਕਟੀਰੀਆ ਦੇ ਧੱਬਿਆਂ ਦਾ ਰੋਗ",
+      disease_early_blight: "ਸ਼ੁਰੂਆਤੀ ਝੁਲਸ ਰੋਗ",
+      disease_late_blight: "ਦੇਰ ਨਾਲ ਹੋਣ ਵਾਲਾ ਝੁਲਸ ਰੋਗ",
+      disease_septoria_leaf_spot: "ਸੈਪਟੋਰੀਆ ਧੱਬਾ ਰੋਗ",
     }
   },
   bn: {
@@ -444,10 +444,10 @@ const resources = {
 
       offline: "অফলাইন",
       online: "অনলাইন",
-      disease_bacterial_spot: "ব্যাকটেরিয়াল লিফ স্পট",
-      disease_early_blight: "আর্লি ব্লাইট",
-      disease_late_blight: "লেট ব্লাইট",
-      disease_septoria_leaf_spot: "সেপ্টোরিয়া লিফ স্পট",
+      disease_bacterial_spot: "পাতায় ব্যাকটেরিয়ার দাগ রোগ",
+      disease_early_blight: "আগাম ঝলসা রোগ",
+      disease_late_blight: "নাবি ঝলসা রোগ",
+      disease_septoria_leaf_spot: "সেপ্টোরিয়া দাগ রোগ",
     }
   },
   ta: {
@@ -554,10 +554,10 @@ const resources = {
 
       offline: "இணையமில்லை",
       online: "இணையத்தில்",
-      disease_bacterial_spot: "பாக்டீரியல் இலைப் புள்ளி",
-      disease_early_blight: "ஆரம்ப இலைக்கருகல்",
-      disease_late_blight: "தாமத இலைக்கருகல்",
-      disease_septoria_leaf_spot: "செப்டோரியா இலைப் புள்ளி",
+      disease_bacterial_spot: "பாக்டீரியா இலைப்புள்ளி நோய்",
+      disease_early_blight: "ஆரம்பகால இலைக்கருகல் நோய்",
+      disease_late_blight: "தாமதகால இலைக்கருகல் நோய்",
+      disease_septoria_leaf_spot: "செப்டோரியா இலைப்புள்ளி நோய்",
     }
   }
 };
