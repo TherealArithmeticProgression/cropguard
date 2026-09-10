@@ -1,10 +1,20 @@
-CropGuard: Offline Crop Disease Detection and Risk Guidance
+<p align="center">
+	<img src="public/pwa-512x512.png" alt="CropGuard logo" width="160">
+</p>
+
+# CropGuard: Offline Crop Disease Detection and Risk Guidance
+
+<p align="center">
+	<a href="https://crop-guard-bay.vercel.app/">Live demonstration: crop-guard-bay.vercel.app</a>
+</p>
 
 CropGuard is a multilingual progressive web application for early tomato-disease
 screening. A farmer captures a leaf photograph, receives an on-device prediction,
 and gets prevention or treatment guidance even when connectivity is unreliable.
 When a connection is available, prediction records and field observations can be
 associated with a farm and synchronized with the Django backend.
+
+The deployed frontend is available at [crop-guard-bay.vercel.app](https://crop-guard-bay.vercel.app/).
 
 This repository is a working demonstration and a foundation for field validation;
 it is not yet a clinically or agronomically validated diagnostic service.
