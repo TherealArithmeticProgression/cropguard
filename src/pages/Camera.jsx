@@ -309,9 +309,14 @@ function Camera() {
       )}
 
       {stream && !pendingShot && (
-        <button className="btn btn-primary" onClick={capturePhoto} disabled={!cameraReady}>
-          {t('capture')}
-        </button>
+        <div className="capture-options">
+          <button className="btn btn-primary" onClick={capturePhoto} disabled={!cameraReady}>
+            {t('capture')}
+          </button>
+          <button className="btn btn-secondary" onClick={() => { stopCamera(); selectFromGallery(); }}>
+            <Icon name="image" size={19} /> {t('choose_gallery')}
+          </button>
+        </div>
       )}
 
       {pendingShot && (
