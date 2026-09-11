@@ -711,6 +711,19 @@ button, input, select {
   pointer-events: none;
 }
 
+.capture-instruction {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.75rem 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--leaf-soft);
+  color: var(--vine-deep);
+  font-weight: 700;
+}
+
 .shot-counter {
   position: absolute;
   top: 12px;

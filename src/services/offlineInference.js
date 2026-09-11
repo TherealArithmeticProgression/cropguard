@@ -16,6 +16,10 @@ const TREATMENTS = {
   septoria_leaf_spot: 'Remove affected leaves, keep foliage dry, and use an approved fungicide according to its label.',
 };
 
+function clamp(value) {
+  return Math.max(0, Math.min(255, value));
+}
+
 let sessionPromise;
 
 function loadImage(dataUrl) {
@@ -33,7 +37,42 @@ function imageToTensor(image) {
   canvas.height = IMAGE_SIZE;
   const context = canvas.getContext('2d', { willReadFrequently: true });
   context.drawImage(image, 0, 0, IMAGE_SIZE, IMAGE_SIZE);
-  const { data } = context.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE);
+  const imageData = context.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE);
+  const { data } = imageData;
+
+  // Keep deployment lighting handling deterministic and identical for every
+  // shot. This is inference normalization, not a substitute for retraining
+  // with targeted photometric augmentation.
+  let redSum = 0, greenSum = 0, blueSum = 0, luminanceSum = 0;
+  const pixelCount = IMAGE_SIZE * IMAGE_SIZE;
+  for (let pixel = 0; pixel < pixelCount; pixel += 1) {
+    const offset = pixel * 4;
+    redSum += data[offset];
+    greenSum += data[offset + 1];
+    blueSum += data[offset + 2];
+    luminanceSum += 0.299 * data[offset] + 0.587 * data[offset + 1] + 0.114 * data[offset + 2];
+  }
+  const redMean = redSum / pixelCount;
+  const greenMean = greenSum / pixelCount;
+  const blueMean = blueSum / pixelCount;
+  const grayMean = (redMean + greenMean + blueMean) / 3;
+  const targetLuminance = 128;
+  const meanLuminance = luminanceSum / pixelCount || targetLuminance;
+  const exposure = Math.max(0.8, Math.min(1.25, targetLuminance / meanLuminance));
+  const gamma = Math.max(0.85, Math.min(1.15, Math.log(0.5) / Math.log(Math.max(0.05, Math.min(0.95, meanLuminance / 255)))));
+  const contrast = 1.1;
+  const whiteBalanceRed = grayMean / (redMean || grayMean);
+  const whiteBalanceGreen = grayMean / (greenMean || grayMean);
+  const whiteBalanceBlue = grayMean / (blueMean || grayMean);
+
+  for (let pixel = 0; pixel < pixelCount; pixel += 1) {
+    const offset = pixel * 4;
+    const normalize = (value, whiteBalance) => clamp(((Math.pow((value * whiteBalance * exposure) / 255, gamma) * 255 - 128) * contrast) + 128);
+    data[offset] = normalize(data[offset], whiteBalanceRed);
+    data[offset + 1] = normalize(data[offset + 1], whiteBalanceGreen);
+    data[offset + 2] = normalize(data[offset + 2], whiteBalanceBlue);
+  }
+
   const tensorData = new Float32Array(3 * IMAGE_SIZE * IMAGE_SIZE);
 
   for (let pixel = 0; pixel < IMAGE_SIZE * IMAGE_SIZE; pixel += 1) {

@@ -191,11 +191,17 @@ function Camera() {
   }
 
   const progressLabel = t('shot_progress', { current: Math.min(shots.length + 1, TOTAL_SHOTS), total: TOTAL_SHOTS });
+  const viewpoint = ['front', 'left', 'right'][Math.min(shots.length, TOTAL_SHOTS - 1)];
+  const viewpointLabel = t('viewpoint_instruction', { view: t(`view_${viewpoint}`) });
 
   return (
     <div className="page page-enter">
       <h1>{t('scan_title')}</h1>
       <p className="page-subtitle">{t('scan_subtitle')}</p>
+      <div className="capture-instruction" role="status">
+        <Icon name="eye" size={20} />
+        <span>{viewpointLabel}</span>
+      </div>
 
       <button
         className="scan-history-toggle"
