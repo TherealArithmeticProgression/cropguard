@@ -121,11 +121,9 @@ function Settings() {
           type="button"
           role="switch"
           aria-checked={presentationMode}
+          aria-label={t('presentation_toggle')}
           onClick={togglePresentationData}
-        >
-          <span>{t('presentation_data')}</span>
-          <span>{presentationMode ? t('on') : t('off')}</span>
-        </button>
+        />
       </div>
     </div>
   )

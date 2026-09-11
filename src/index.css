@@ -900,23 +900,19 @@ button, input, select {
 .local-estimate-list { display: grid; gap: 0.35rem; margin-top: 0.6rem; color: var(--ink-muted); font-size: 0.8rem; }
 .settings-note { color: var(--ink-muted); font-size: 0.85rem; }
 .presentation-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: block;
   width: 100%;
-  min-height: 42px;
+  height: 10px;
   margin-top: 0.8rem;
-  padding: 0.55rem 0;
+  padding: 0;
   border: 0;
-  border-top: 1px solid var(--border);
+  border-radius: 999px;
   background: transparent;
-  color: var(--ink-muted);
-  font: inherit;
-  font-weight: 700;
-  text-align: left;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
-.presentation-toggle span:last-child { color: var(--vine); }
+.presentation-toggle.is-on { background: var(--leaf); }
+.presentation-toggle:not(.is-on) { background: var(--surface); border: 1px solid var(--border); }
 .presentation-toggle:focus-visible { border-radius: 4px; }
 .result-confidence { color: var(--ink-muted); font-size: 0.9rem; }
 .model-score-row { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid var(--border); }
