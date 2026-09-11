@@ -1,7 +1,7 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'cropguard-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export async function initDB() {
   return openDB(DB_NAME, DB_VERSION, {
@@ -118,4 +118,12 @@ export async function savePresentationScenarios(scenarios) {
 export async function getPresentationScenarios() {
   const db = await initDB();
   return db.getAll('presentationScenarios');
+}
+
+export async function clearPresentationData() {
+  const db = await initDB();
+  const tx = db.transaction(['presentationScenarios', 'riskScores'], 'readwrite');
+  await tx.objectStore('presentationScenarios').clear();
+  await tx.objectStore('riskScores').clear();
+  await tx.done;
 }

@@ -142,6 +142,7 @@ const resources = {
       farm_info_placeholder: "Farm name, location, and crop details go here.",
       about: "About",
       about_body: "CropGuard is a presentation prototype developed for SIH26210. It aims to demonstrate offline-first crop disease support, sensor-based risk awareness, and practical guidance for farmers. Results are educational and should be confirmed with local agricultural experts.",
+      presentation_data: "Presentation data",
       sync_now: "Sync now",
 
       offline: "Offline",
@@ -276,6 +277,7 @@ const resources = {
       farm_info_placeholder: "खेत का नाम, स्थान और फसल यहां जोड़ें।",
       about: "ऐप के बारे में",
       about_body: "CropGuard SIH26210 के लिए बनाया गया एक प्रस्तुति प्रोटोटाइप है। इसका उद्देश्य ऑफलाइन फसल रोग सहायता, सेंसर आधारित खतरे की जानकारी और किसानों के लिए उपयोगी सलाह दिखाना है। परिणाम केवल जानकारी के लिए हैं; स्थानीय कृषि विशेषज्ञ से पुष्टि करें।",
+      presentation_data: "प्रस्तुति डेटा",
       sync_now: "अभी सिंक करें",
 
       offline: "ऑफ़लाइन",

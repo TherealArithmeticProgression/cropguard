@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { setPreference, getPreference, getPendingPredictions, savePresentationScenarios, saveRiskScores, addSensorData } from '../db/indexedDB'
+import { setPreference, getPreference, getPendingPredictions, savePresentationScenarios, saveRiskScores, addSensorData, clearPresentationData } from '../db/indexedDB'
 import { SUPPORTED_LANGUAGES } from '../i18n'
 import Icon from '../components/Icon'
 import { setVoiceGuidanceEnabled, voiceSupported } from '../services/voiceGuidance'
@@ -10,8 +10,7 @@ function Settings() {
   const [language, setLanguage] = useState(i18n.language);
   const [pendingCount, setPendingCount] = useState(0);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const [aboutTapCount, setAboutTapCount] = useState(0);
-  const aboutTapTimer = useRef(null);
+  const [presentationMode, setPresentationMode] = useState(false);
 
   const presentationScenarios = [
     { id: 'cool-wet', temperature: 19, humidity: 92, soilMoisture: 84, topDisease: 'late_blight', topScore: 86, band: 'critical' },
@@ -24,6 +23,7 @@ function Settings() {
     getPreference('userLang').then((saved) => { if (saved) setLanguage(saved); });
     getPendingPredictions().then((p) => setPendingCount(p.length));
     getPreference('voiceGuidance').then((enabled) => setVoiceEnabled(enabled === true));
+    getPreference('presentationMode').then((enabled) => setPresentationMode(enabled === true));
   }, []);
 
   async function selectLanguage(code) {
@@ -59,27 +59,19 @@ function Settings() {
       { disease: 'bacterial_spot', score: 44, band: 'moderate', explanation: 'Warm, wet splash events can increase bacterial spot risk.' },
     ]);
     await setPreference('presentationMode', true);
+    setPresentationMode(true);
     window.dispatchEvent(new CustomEvent('sensorDataUpdated'));
-    setAboutTapCount(0);
   }
 
-  function handleAboutGesture(event) {
-    if (event.type === 'contextmenu') {
-      event.preventDefault();
-      activatePresentationData();
+  async function togglePresentationData() {
+    if (presentationMode) {
+      await clearPresentationData();
+      await setPreference('presentationMode', false);
+      setPresentationMode(false);
+      window.dispatchEvent(new CustomEvent('sensorDataUpdated'));
       return;
     }
-    if (event.type === 'dblclick') {
-      activatePresentationData();
-      return;
-    }
-    setAboutTapCount((count) => {
-      const next = count + 1;
-      clearTimeout(aboutTapTimer.current);
-      aboutTapTimer.current = setTimeout(() => setAboutTapCount(0), 700);
-      if (next >= 2) activatePresentationData();
-      return next;
-    });
+    await activatePresentationData();
   }
 
   return (
@@ -122,8 +114,18 @@ function Settings() {
       </div>
 
       <div className="card">
-        <div className="card-label" onContextMenu={handleAboutGesture} onDoubleClick={handleAboutGesture} onClick={handleAboutGesture}>{t('about')}</div>
+        <div className="card-label">{t('about')}</div>
         <p style={{ color: 'var(--ink-muted)', fontSize: '0.9rem' }}>{t('about_body')}</p>
+        <button
+          className={`presentation-toggle ${presentationMode ? 'is-on' : ''}`}
+          type="button"
+          role="switch"
+          aria-checked={presentationMode}
+          onClick={togglePresentationData}
+        >
+          <span>{t('presentation_data')}</span>
+          <span>{presentationMode ? t('on') : t('off')}</span>
+        </button>
       </div>
     </div>
   )
