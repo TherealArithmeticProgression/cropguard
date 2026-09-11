@@ -29,7 +29,12 @@ export async function verifyOtp(phone_number, otp, language) {
  * calculate_all_risks() output shape.
  */
 export async function fetchRiskScores(farmId) {
-  return api(`/risk-score/${farmId}/`, { method: 'GET' });
+  const payload = await api(`/risk-score/${farmId}/all/`, { method: 'GET' });
+  const risks = Array.isArray(payload) ? payload : payload.risks || [];
+  return risks.map((risk) => ({
+    ...risk,
+    disease: risk.disease === 'bacterial_leaf_spot' ? 'bacterial_spot' : risk.disease,
+  }));
 }
 
 export async function submitPredictionFeedback(predictionId, wasCorrect) {

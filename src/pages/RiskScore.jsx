@@ -16,15 +16,26 @@ const BAND_COLOR = {
 };
 
 /**
- * Rough, deliberately simple client-side estimate from a single instant BLE
- * reading -- NOT a replacement for the full rolling-trend risk_engine.py
- * calculation that runs server-side once data syncs. Matches the "quick local
- * estimate vs. full trend-based score" split agreed on for the BLE flow.
+ * A single reading cannot reproduce the backend's rolling-window score. These
+ * provisional per-disease values use the same environmental bands as the
+ * backend and are replaced by the full score after sync.
  */
-function quickLocalEstimate(temp, humidity) {
-  const tempFactor = temp >= 20 && temp <= 30 ? 1 : 0.4;
-  const humidityFactor = humidity >= 80 ? 1 : humidity / 100;
-  return Math.round(Math.min(tempFactor * humidityFactor * 100, 100));
+function quickLocalEstimates(temp, humidity) {
+  const score = (tempFactor, humidityFactor) => Math.round(tempFactor * humidityFactor * 100);
+  const above = (value, threshold, maximum) => Math.max(0, Math.min(1, (value - threshold) / (maximum - threshold)));
+  const trapezoid = (value, low, optimalLow, optimalHigh, high) => {
+    if (value <= low || value >= high) return 0;
+    if (value >= optimalLow && value <= optimalHigh) return 1;
+    return value < optimalLow
+      ? (value - low) / (optimalLow - low)
+      : (high - value) / (high - optimalHigh);
+  };
+  return [
+    { disease: 'late_blight', score: score(trapezoid(temp, 6, 15, 22, 27), above(humidity, 85, 97)) },
+    { disease: 'early_blight', score: score(trapezoid(temp, 15, 24, 29, 34), above(humidity, 80, 95)) },
+    { disease: 'septoria_leaf_spot', score: score(trapezoid(temp, 12, 20, 25, 30), above(humidity, 85, 100)) },
+    { disease: 'bacterial_leaf_spot', score: score(trapezoid(temp, 18, 24, 30, 35), above(humidity, 80, 95)) },
+  ];
 }
 
 function RiskScore() {
@@ -78,7 +89,7 @@ function RiskScore() {
       setStatusText('');
 
       if (Number.isFinite(t2) && Number.isFinite(h2)) {
-        setLocalEstimate(quickLocalEstimate(t2, h2));
+        setLocalEstimate(quickLocalEstimates(t2, h2));
         await addSensorData({ temperature: t2, humidity: h2, soil_moisture: parseFloat(m1) || null });
         window.dispatchEvent(new CustomEvent('sensorDataUpdated'));
       }
@@ -102,7 +113,13 @@ function RiskScore() {
       )}
 
       {riskScores.map((r) => (
-        <div key={r.disease} className="disease-row" onClick={() => setExpanded(expanded === r.disease ? null : r.disease)}>
+        <div key={r.disease} className="disease-row">
+          <button
+            className="disease-row-toggle"
+            type="button"
+            aria-expanded={expanded === r.disease}
+            onClick={() => setExpanded(expanded === r.disease ? null : r.disease)}
+          >
           <div className="disease-row-head">
             <span className="disease-name">{t(`disease_${r.disease}`, { defaultValue: r.disease })}</span>
             <span
@@ -112,6 +129,7 @@ function RiskScore() {
               {r.score}/100
             </span>
           </div>
+          </button>
           {expanded === r.disease && (
             <div className="disease-why">{r.explanation}</div>
           )}
@@ -137,9 +155,14 @@ function RiskScore() {
               <span><Icon name="leaf" size={17} /> {t('sensor_moisture')}</span><strong>{moisture}</strong>
             </div>
             {localEstimate != null && (
-              <p style={{ marginTop: '0.6rem', fontSize: '0.8rem', color: 'var(--ink-muted)' }}>
-                {t('local_estimate_note')} ({localEstimate}/100)
-              </p>
+              <div className="local-estimate-list">
+                <p>{t('local_estimate_note')}</p>
+                {localEstimate.map((estimate) => (
+                  <span key={estimate.disease}>
+                    {t(`disease_${estimate.disease}`, { defaultValue: estimate.disease })}: {estimate.score}/100
+                  </span>
+                ))}
+              </div>
             )}
           </>
         )}

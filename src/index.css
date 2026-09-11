@@ -807,6 +807,16 @@ button, input, select {
   border: 1px solid var(--border);
   padding: 0.9rem 1rem;
   margin-bottom: 0.7rem;
+}
+.disease-row-toggle {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
   cursor: pointer;
 }
 .disease-row-head {
@@ -842,6 +852,20 @@ button, input, select {
   cursor: pointer;
   min-height: 48px;
 }
+.option-row-static { cursor: default; }
+.toggle-button {
+  min-width: 56px;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--ink-muted);
+  font-weight: 700;
+  cursor: pointer;
+}
+.toggle-button.is-on { background: var(--vine); color: var(--ink-on-dark); }
+.local-estimate-list { display: grid; gap: 0.35rem; margin-top: 0.6rem; color: var(--ink-muted); font-size: 0.8rem; }
+.settings-note { color: var(--ink-muted); font-size: 0.85rem; }
 .option-row:last-child { border-bottom: none; }
 
 .empty-state {
