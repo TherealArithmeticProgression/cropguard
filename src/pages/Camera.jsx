@@ -65,6 +65,7 @@ function Camera() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const galleryInputRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [shots, setShots] = useState([]); // array of { dataUrl, sharpness }
   const [pendingShot, setPendingShot] = useState(null); // shot awaiting accept/retake
@@ -136,6 +137,34 @@ function Camera() {
     const sharpness = estimateSharpness(canvas);
     stopCamera();
     setPendingShot({ dataUrl, sharpness, isBlurry: sharpness < BLUR_VARIANCE_THRESHOLD });
+  }
+
+  function selectFromGallery() {
+    galleryInputRef.current?.click();
+  }
+
+  function handleGalleryImage(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !file.type.startsWith('image/')) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        canvas.getContext('2d').drawImage(image, 0, 0);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const sharpness = estimateSharpness(canvas);
+        setPendingShot({ dataUrl, sharpness, isBlurry: sharpness < BLUR_VARIANCE_THRESHOLD });
+      };
+      image.onerror = () => setCameraError(t('gallery_invalid'));
+      image.src = reader.result;
+    };
+    reader.onerror = () => setCameraError(t('gallery_invalid'));
+    reader.readAsDataURL(file);
   }
 
   function acceptShot() {
@@ -251,6 +280,15 @@ function Camera() {
         {!stream && !pendingShot && shots.length > 0 && <img src={shots[shots.length - 1].dataUrl} alt="Last captured leaf" />}
       </div>
 
+      <input
+        ref={galleryInputRef}
+        className="sr-only"
+        type="file"
+        accept="image/*"
+        onChange={handleGalleryImage}
+        aria-label={t('choose_gallery')}
+      />
+
       {cameraError && <div className="quality-warning">{cameraError}</div>}
 
       {pendingShot?.isBlurry && (
@@ -260,9 +298,14 @@ function Camera() {
       )}
 
       {!stream && !pendingShot && shots.length === 0 && (
-        <button className="btn btn-primary" onClick={startCamera}>
-          <Icon name="camera" size={19} /> {t('open_camera')}
-        </button>
+        <div className="capture-options">
+          <button className="btn btn-primary" onClick={startCamera}>
+            <Icon name="camera" size={19} /> {t('open_camera')}
+          </button>
+          <button className="btn btn-secondary" onClick={selectFromGallery}>
+            <Icon name="image" size={19} /> {t('choose_gallery')}
+          </button>
+        </div>
       )}
 
       {stream && !pendingShot && (
@@ -287,9 +330,14 @@ function Camera() {
       )}
 
       {!stream && !pendingShot && shots.length > 0 && shots.length < TOTAL_SHOTS && (
-        <button className="btn btn-primary" onClick={startCamera}>
-          <Icon name="camera" size={19} /> {t('open_camera')}
-        </button>
+        <div className="capture-options">
+          <button className="btn btn-primary" onClick={startCamera}>
+            <Icon name="camera" size={19} /> {t('open_camera')}
+          </button>
+          <button className="btn btn-secondary" onClick={selectFromGallery}>
+            <Icon name="image" size={19} /> {t('choose_gallery')}
+          </button>
+        </div>
       )}
 
       {!stream && !pendingShot && shots.length === TOTAL_SHOTS && !submitting && (

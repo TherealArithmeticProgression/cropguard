@@ -724,6 +724,16 @@ button, input, select {
   font-weight: 700;
 }
 
+.capture-options {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.capture-options .btn {
+  flex: 1;
+}
+
 .shot-counter {
   position: absolute;
   top: 12px;
