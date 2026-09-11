@@ -15,6 +15,27 @@ const BAND_COLOR = {
   critical: 'var(--tomato)',
 };
 
+const DEMO_SCENARIOS = {
+  cool_wet: {
+    temperature: '19', humidity: '92', moisture: '84',
+    risks: [
+      { disease: 'late_blight', score: 86, band: 'critical', explanation: 'Example only: cool temperature, high humidity, and wet conditions are favorable for late blight.' },
+      { disease: 'septoria_leaf_spot', score: 72, band: 'high', explanation: 'Example only: several wet days can increase Septoria risk.' },
+      { disease: 'early_blight', score: 38, band: 'moderate', explanation: 'Example only: the temperature is below the strongest early-blight range.' },
+      { disease: 'bacterial_spot', score: 44, band: 'moderate', explanation: 'Example only: warm, wet splash events would increase this risk.' },
+    ],
+  },
+  hot_dry: {
+    temperature: '31', humidity: '48', moisture: '32',
+    risks: [
+      { disease: 'late_blight', score: 8, band: 'low', explanation: 'Example only: hot, dry conditions are less favorable for late blight.' },
+      { disease: 'septoria_leaf_spot', score: 12, band: 'low', explanation: 'Example only: low humidity and little wetness reduce Septoria risk.' },
+      { disease: 'early_blight', score: 42, band: 'moderate', explanation: 'Example only: warm conditions can still support early blight if plants are stressed.' },
+      { disease: 'bacterial_spot', score: 18, band: 'low', explanation: 'Example only: without rain or splash events, bacterial spot risk is lower.' },
+    ],
+  },
+};
+
 /**
  * A single reading cannot reproduce the backend's rolling-window score. These
  * provisional per-disease values use the same environmental bands as the
@@ -47,6 +68,7 @@ function RiskScore() {
   const [moisture, setMoisture] = useState(null);
   const [statusText, setStatusText] = useState('');
   const [localEstimate, setLocalEstimate] = useState(null);
+  const [demoScenario, setDemoScenario] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -100,10 +122,40 @@ function RiskScore() {
     }
   };
 
+  function showDemo(scenario) {
+    const selected = DEMO_SCENARIOS[scenario];
+    setDemoScenario(scenario);
+    setRiskScores(selected.risks);
+    setTemperature(selected.temperature);
+    setHumidity(selected.humidity);
+    setMoisture(selected.moisture);
+    setStatusText('');
+  }
+
+  function clearDemo() {
+    setDemoScenario(null);
+    setRiskScores([]);
+    setTemperature(null);
+    setHumidity(null);
+    setMoisture(null);
+  }
+
   return (
     <div className="page page-enter">
       <h1>{t('risk_title')}</h1>
       <p className="page-subtitle">{t('risk_subtitle')}</p>
+
+      <div className="demo-panel">
+        <strong>{t('risk_demo_title')}</strong>
+        <p>{t('risk_demo_body')}</p>
+        <div className="demo-actions">
+          <button className="btn btn-secondary" type="button" onClick={() => showDemo('cool_wet')}>{t('risk_demo_wet')}</button>
+          <button className="btn btn-secondary" type="button" onClick={() => showDemo('hot_dry')}>{t('risk_demo_dry')}</button>
+          {demoScenario && <button className="text-button" type="button" onClick={clearDemo}>{t('risk_demo_clear')}</button>}
+        </div>
+      </div>
+
+      {demoScenario && <div className="demo-warning" role="status">{t('risk_demo_active')}</div>}
 
       {riskScores.length === 0 && (
         <div className="empty-state">

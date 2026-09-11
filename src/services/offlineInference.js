@@ -146,6 +146,8 @@ export async function predictDiseaseOffline(dataUrls, onProgress = () => {}) {
     diseaseLabel: best.label,
     confidence: best.confidence,
     topThree: ranked.slice(0, 3),
+    modelScores: ranked,
+    modelOutputCount: scores.length,
     treatment: TREATMENTS[best.label],
     syncStatus: 'offline',
   };

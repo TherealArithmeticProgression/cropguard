@@ -74,7 +74,23 @@ function Result() {
         <h2 style={{ color: 'var(--vine)', margin: '0.3rem 0' }}>
           {t(`disease_${prediction.diseaseLabel}`, { defaultValue: prediction.diseaseLabel })}
         </h2>
+        <p className="result-confidence">
+          {t('confidence')}: {prediction.confidence}%
+        </p>
       </div>
+
+      {prediction.modelScores?.length > 0 && (
+        <div className="card">
+          <div className="card-label">{t('model_scores')}</div>
+          {prediction.modelScores.map((score) => (
+            <div className="model-score-row" key={score.label}>
+              <span>{t(`disease_${score.label}`, { defaultValue: score.label })}</span>
+              <strong>{score.confidence}%</strong>
+            </div>
+          ))}
+          <p className="settings-note">{t('model_scores_note')}</p>
+        </div>
+      )}
 
       <div className="card">
         <div className="card-label">{t('recommended_treatment')}</div>
