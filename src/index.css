@@ -897,6 +897,10 @@ button, input, select {
 .demo-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.6rem; }
 .demo-actions .btn { flex: 1; min-width: 8rem; }
 .demo-warning { padding: 0.55rem 0.7rem; border-left: 3px solid var(--turmeric); background: var(--turmeric-soft); }
+.presentation-table-wrap { overflow-x: auto; }
+.presentation-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.presentation-table th, .presentation-table td { padding: 0.5rem 0.35rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.presentation-table th { color: var(--ink-muted); font-size: 0.7rem; }
 .option-row:last-child { border-bottom: none; }
 
 .empty-state {

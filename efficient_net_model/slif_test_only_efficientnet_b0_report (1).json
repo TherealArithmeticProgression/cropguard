@@ -1,0 +1,75 @@
+{
+  "accuracy": 0.90625,
+  "macro_f1": 0.6250852079072937,
+  "report": {
+    "bacterial_spot": {
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1-score": 0.8888888888888888,
+      "support": 4.0
+    },
+    "early_blight": {
+      "precision": 1.0,
+      "recall": 0.8953488372093024,
+      "f1-score": 0.9447852760736196,
+      "support": 86.0
+    },
+    "late_blight": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1-score": 0.6666666666666666,
+      "support": 6.0
+    },
+    "septoria_leaf_spot": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 0.0
+    },
+    "accuracy": 0.90625,
+    "macro avg": {
+      "precision": 0.575,
+      "recall": 0.7238372093023255,
+      "f1-score": 0.6250852079072937,
+      "support": 96.0
+    },
+    "weighted avg": {
+      "precision": 0.9604166666666667,
+      "recall": 0.90625,
+      "f1-score": 0.925073846852988,
+      "support": 96.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      4,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      77,
+      6,
+      2
+    ],
+    [
+      0,
+      0,
+      6,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "classes": [
+    "bacterial_spot",
+    "early_blight",
+    "late_blight",
+    "septoria_leaf_spot"
+  ]
+}

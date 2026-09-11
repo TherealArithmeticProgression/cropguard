@@ -25,6 +25,9 @@ export async function initDB() {
       if (!db.objectStoreNames.contains('riskScores')) {
         db.createObjectStore('riskScores', { keyPath: 'disease' });
       }
+      if (!db.objectStoreNames.contains('presentationScenarios')) {
+        db.createObjectStore('presentationScenarios', { keyPath: 'id' });
+      }
     },
   });
 }
@@ -101,4 +104,18 @@ export async function saveRiskScores(riskResults) {
 export async function getCachedRiskScores() {
   const db = await initDB();
   return db.getAll('riskScores');
+}
+
+export async function savePresentationScenarios(scenarios) {
+  const db = await initDB();
+  const tx = db.transaction('presentationScenarios', 'readwrite');
+  await tx.store.clear();
+  await Promise.all(scenarios.map((scenario) => tx.store.put(scenario)));
+  await tx.done;
+  return scenarios;
+}
+
+export async function getPresentationScenarios() {
+  const db = await initDB();
+  return db.getAll('presentationScenarios');
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getCachedRiskScores, saveRiskScores, addSensorData, getPreference } from '../db/indexedDB';
+import { getCachedRiskScores, saveRiskScores, addSensorData, getPreference, getPresentationScenarios } from '../db/indexedDB';
 import { fetchRiskScores } from '../services/api';
 import Icon from '../components/Icon';
 
@@ -13,27 +13,6 @@ const BAND_COLOR = {
   moderate: 'var(--turmeric)',
   high: 'var(--tomato)',
   critical: 'var(--tomato)',
-};
-
-const DEMO_SCENARIOS = {
-  cool_wet: {
-    temperature: '19', humidity: '92', moisture: '84',
-    risks: [
-      { disease: 'late_blight', score: 86, band: 'critical', explanation: 'Example only: cool temperature, high humidity, and wet conditions are favorable for late blight.' },
-      { disease: 'septoria_leaf_spot', score: 72, band: 'high', explanation: 'Example only: several wet days can increase Septoria risk.' },
-      { disease: 'early_blight', score: 38, band: 'moderate', explanation: 'Example only: the temperature is below the strongest early-blight range.' },
-      { disease: 'bacterial_spot', score: 44, band: 'moderate', explanation: 'Example only: warm, wet splash events would increase this risk.' },
-    ],
-  },
-  hot_dry: {
-    temperature: '31', humidity: '48', moisture: '32',
-    risks: [
-      { disease: 'late_blight', score: 8, band: 'low', explanation: 'Example only: hot, dry conditions are less favorable for late blight.' },
-      { disease: 'septoria_leaf_spot', score: 12, band: 'low', explanation: 'Example only: low humidity and little wetness reduce Septoria risk.' },
-      { disease: 'early_blight', score: 42, band: 'moderate', explanation: 'Example only: warm conditions can still support early blight if plants are stressed.' },
-      { disease: 'bacterial_spot', score: 18, band: 'low', explanation: 'Example only: without rain or splash events, bacterial spot risk is lower.' },
-    ],
-  },
 };
 
 /**
@@ -68,13 +47,16 @@ function RiskScore() {
   const [moisture, setMoisture] = useState(null);
   const [statusText, setStatusText] = useState('');
   const [localEstimate, setLocalEstimate] = useState(null);
-  const [demoScenario, setDemoScenario] = useState(null);
+  const [presentationScenarios, setPresentationScenarios] = useState([]);
 
   useEffect(() => {
     async function load() {
       const cached = await getCachedRiskScores();
       setRiskScores(cached);
+      const presentationMode = await getPreference('presentationMode');
+      if (presentationMode) setPresentationScenarios(await getPresentationScenarios());
       try {
+        if (presentationMode) return;
         const farmId = (await getPreference('farmId')) || 'default';
         const fresh = await fetchRiskScores(farmId);
         setRiskScores(fresh);
@@ -122,40 +104,24 @@ function RiskScore() {
     }
   };
 
-  function showDemo(scenario) {
-    const selected = DEMO_SCENARIOS[scenario];
-    setDemoScenario(scenario);
-    setRiskScores(selected.risks);
-    setTemperature(selected.temperature);
-    setHumidity(selected.humidity);
-    setMoisture(selected.moisture);
-    setStatusText('');
-  }
-
-  function clearDemo() {
-    setDemoScenario(null);
-    setRiskScores([]);
-    setTemperature(null);
-    setHumidity(null);
-    setMoisture(null);
-  }
-
   return (
     <div className="page page-enter">
       <h1>{t('risk_title')}</h1>
       <p className="page-subtitle">{t('risk_subtitle')}</p>
 
-      <div className="demo-panel">
-        <strong>{t('risk_demo_title')}</strong>
-        <p>{t('risk_demo_body')}</p>
-        <div className="demo-actions">
-          <button className="btn btn-secondary" type="button" onClick={() => showDemo('cool_wet')}>{t('risk_demo_wet')}</button>
-          <button className="btn btn-secondary" type="button" onClick={() => showDemo('hot_dry')}>{t('risk_demo_dry')}</button>
-          {demoScenario && <button className="text-button" type="button" onClick={clearDemo}>{t('risk_demo_clear')}</button>}
+      {presentationScenarios.length > 0 && (
+        <div className="card presentation-table-card">
+          <div className="card-label">{t('presentation_readings')}</div>
+          <div className="presentation-table-wrap">
+            <table className="presentation-table">
+              <thead><tr><th>{t('condition')}</th><th>{t('sensor_temp')}</th><th>{t('sensor_humidity')}</th><th>{t('sensor_moisture')}</th><th>{t('risk')}</th></tr></thead>
+              <tbody>{presentationScenarios.map((scenario) => <tr key={scenario.id}>
+                <td>{t(`condition_${scenario.id}`, { defaultValue: scenario.id })}</td><td>{scenario.temperature}°C</td><td>{scenario.humidity}%</td><td>{scenario.soilMoisture}%</td><td><strong>{scenario.topScore}/100</strong><br /><small>{t(`disease_${scenario.topDisease}`, { defaultValue: scenario.topDisease })}</small></td>
+              </tr>)}</tbody>
+            </table>
+          </div>
         </div>
-      </div>
-
-      {demoScenario && <div className="demo-warning" role="status">{t('risk_demo_active')}</div>}
+      )}
 
       {riskScores.length === 0 && (
         <div className="empty-state">

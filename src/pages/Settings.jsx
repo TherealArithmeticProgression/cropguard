@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { setPreference, getPreference, getPendingPredictions } from '../db/indexedDB'
+import { setPreference, getPreference, getPendingPredictions, savePresentationScenarios, saveRiskScores, addSensorData } from '../db/indexedDB'
 import { SUPPORTED_LANGUAGES } from '../i18n'
 import Icon from '../components/Icon'
 import { setVoiceGuidanceEnabled, voiceSupported } from '../services/voiceGuidance'
@@ -10,6 +10,15 @@ function Settings() {
   const [language, setLanguage] = useState(i18n.language);
   const [pendingCount, setPendingCount] = useState(0);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [aboutTapCount, setAboutTapCount] = useState(0);
+  const aboutTapTimer = useRef(null);
+
+  const presentationScenarios = [
+    { id: 'cool-wet', temperature: 19, humidity: 92, soilMoisture: 84, topDisease: 'late_blight', topScore: 86, band: 'critical' },
+    { id: 'warm-humid', temperature: 27, humidity: 88, soilMoisture: 76, topDisease: 'early_blight', topScore: 78, band: 'high' },
+    { id: 'moderate-rain', temperature: 23, humidity: 86, soilMoisture: 68, topDisease: 'septoria_leaf_spot', topScore: 72, band: 'high' },
+    { id: 'hot-dry', temperature: 31, humidity: 48, soilMoisture: 32, topDisease: 'early_blight', topScore: 42, band: 'moderate' },
+  ];
 
   useEffect(() => {
     getPreference('userLang').then((saved) => { if (saved) setLanguage(saved); });
@@ -29,6 +38,48 @@ function Settings() {
     const next = !voiceEnabled;
     setVoiceEnabled(next);
     await setVoiceGuidanceEnabled(next);
+  }
+
+  async function activatePresentationData() {
+    const scenarios = presentationScenarios.map((scenario) => ({
+      ...scenario,
+      createdAt: new Date().toISOString(),
+    }));
+    await savePresentationScenarios(scenarios);
+    await Promise.all(scenarios.map((scenario) => addSensorData({
+      temperature: scenario.temperature,
+      humidity: scenario.humidity,
+      soil_moisture: scenario.soilMoisture,
+      source: 'presentation',
+    })));
+    await saveRiskScores([
+      { disease: 'late_blight', score: 86, band: 'critical', explanation: 'Cool temperature and high humidity are favorable for late blight.' },
+      { disease: 'early_blight', score: 78, band: 'high', explanation: 'Warm, humid conditions can increase early blight risk.' },
+      { disease: 'septoria_leaf_spot', score: 72, band: 'high', explanation: 'Repeated wet conditions can increase Septoria risk.' },
+      { disease: 'bacterial_spot', score: 44, band: 'moderate', explanation: 'Warm, wet splash events can increase bacterial spot risk.' },
+    ]);
+    await setPreference('presentationMode', true);
+    window.dispatchEvent(new CustomEvent('sensorDataUpdated'));
+    setAboutTapCount(0);
+  }
+
+  function handleAboutGesture(event) {
+    if (event.type === 'contextmenu') {
+      event.preventDefault();
+      activatePresentationData();
+      return;
+    }
+    if (event.type === 'dblclick') {
+      activatePresentationData();
+      return;
+    }
+    setAboutTapCount((count) => {
+      const next = count + 1;
+      clearTimeout(aboutTapTimer.current);
+      aboutTapTimer.current = setTimeout(() => setAboutTapCount(0), 700);
+      if (next >= 2) activatePresentationData();
+      return next;
+    });
   }
 
   return (
@@ -71,7 +122,7 @@ function Settings() {
       </div>
 
       <div className="card">
-        <div className="card-label">{t('about')}</div>
+        <div className="card-label" onContextMenu={handleAboutGesture} onDoubleClick={handleAboutGesture} onClick={handleAboutGesture}>{t('about')}</div>
         <p style={{ color: 'var(--ink-muted)', fontSize: '0.9rem' }}>{t('about_body')}</p>
       </div>
     </div>

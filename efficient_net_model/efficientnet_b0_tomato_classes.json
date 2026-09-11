@@ -1,0 +1,9 @@
+{
+  "classes": [
+    "bacterial_spot",
+    "early_blight",
+    "late_blight",
+    "septoria_leaf_spot"
+  ],
+  "img_size": 224
+}
