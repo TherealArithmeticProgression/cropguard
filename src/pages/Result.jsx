@@ -51,6 +51,20 @@ function Result() {
   }
 
   if (prediction.confidence == null) {
+    if (prediction.analysisStatus === 'needs_retake') {
+      return (
+        <div className="page page-enter">
+          <h1>{t('result_title')}</h1>
+          <div className="card">
+            <div className="card-label">{t('analysis_not_confident_title')}</div>
+            <p style={{ marginTop: '0.6rem', color: 'var(--ink-muted)' }}>{t('analysis_not_confident_body')}</p>
+          </div>
+          <Link to="/camera" className="btn btn-primary" style={{ textDecoration: 'none', marginTop: '1rem' }}>
+            {t('scan_again')}
+          </Link>
+        </div>
+      );
+    }
     return (
       <div className="page page-enter">
         <h1>{t('result_title')}</h1>

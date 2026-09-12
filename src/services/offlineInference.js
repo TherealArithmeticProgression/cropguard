@@ -2,6 +2,8 @@ import * as ort from 'onnxruntime-web';
 
 const MODEL_URL = '/weights_final_.onnx';
 const IMAGE_SIZE = 224;
+const MIN_CONFIDENCE = 0.55;
+const MIN_CONFIDENCE_MARGIN = 0.10;
 const IMAGENET_MEAN = [0.485, 0.456, 0.406];
 const IMAGENET_STD = [0.229, 0.224, 0.225];
 const CLASS_NAMES = [
@@ -117,18 +119,34 @@ export async function predictDiseaseOffline(dataUrls, onProgress = () => {}) {
     }))
     .sort((a, b) => b.confidence - a.confidence);
   const best = ranked[0];
+  const confidenceMargin = best.confidence - ranked[1].confidence;
+  const bestLabels = predictions.map((prediction) => (
+    CLASS_NAMES[prediction.indexOf(Math.max(...prediction))]
+  ));
+  const labelCounts = bestLabels.reduce((counts, label) => ({
+    ...counts,
+    [label]: (counts[label] || 0) + 1,
+  }), {});
+  const strongestAgreement = Math.max(...Object.values(labelCounts));
+  const rejected = (
+    best.confidence < MIN_CONFIDENCE * 100
+    || confidenceMargin < MIN_CONFIDENCE_MARGIN * 100
+    || (images.length >= 3 && strongestAgreement < 2)
+  );
 
   onProgress(90, 'Checking the model result');
   await new Promise((resolve) => setTimeout(resolve, 120));
   onProgress(100, 'Analysis complete');
 
   return {
-    diseaseLabel: best.label,
-    confidence: best.confidence,
+    diseaseLabel: rejected ? null : best.label,
+    confidence: rejected ? null : best.confidence,
     topThree: ranked.slice(0, 3),
     modelScores: ranked,
     modelOutputCount: CLASS_NAMES.length,
-    treatment: TREATMENTS[best.label],
+    treatment: rejected ? null : TREATMENTS[best.label],
+    analysisStatus: rejected ? 'needs_retake' : 'accepted',
+    rejectionReason: rejected ? 'The image did not provide a consistent enough leaf signal.' : null,
     syncStatus: 'offline',
   };
 }

@@ -63,6 +63,8 @@ const resources = {
       analysis_reading_features: "Reading leaf features",
       analysis_checking_result: "Checking the model result",
       analysis_complete: "Analysis complete",
+      analysis_not_confident_title: "No reliable leaf result",
+      analysis_not_confident_body: "The photos did not give the model a consistent enough leaf signal. Please retake the photos with the leaf filling the frame.",
       analysis_model_view: "What the model sees",
       analysis_original_image: "Original photo",
       analysis_model_input: "Center crop - 224 x 224",
