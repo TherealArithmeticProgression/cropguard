@@ -63,6 +63,10 @@ const resources = {
       analysis_reading_features: "Reading leaf features",
       analysis_checking_result: "Checking the model result",
       analysis_complete: "Analysis complete",
+      analysis_model_view: "What the model sees",
+      analysis_original_image: "Original photo",
+      analysis_model_input: "Center crop - 224 x 224",
+      analysis_model_view_note: "The square image above is the view sent into the offline model.",
       scan_again: "Scan another leaf",
       camera_denied: "Couldn't access the camera. Check your browser permissions.",
 

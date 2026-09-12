@@ -74,6 +74,8 @@ function Camera() {
   const [cameraReady, setCameraReady] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisMessage, setAnalysisMessage] = useState('');
+  const [analysisPreview, setAnalysisPreview] = useState(null);
+  const [analysisPreviewStage, setAnalysisPreviewStage] = useState('original');
   const [recentScansOpen, setRecentScansOpen] = useState(false);
   const [recentScans, setRecentScans] = useState([]);
 
@@ -185,6 +187,8 @@ function Camera() {
     setSubmitting(true);
     setAnalysisProgress(5);
     setAnalysisMessage(t('analysis_loading_model'));
+    setAnalysisPreview(allShots[0].dataUrl);
+    setAnalysisPreviewStage('original');
     const record = await savePrediction({
       image: allShots[0].dataUrl,
       shotCount: allShots.length,
@@ -193,9 +197,13 @@ function Camera() {
     });
 
     try {
-      const result = await predictDiseaseOffline(allShots.map((shot) => shot.dataUrl), (progress, message) => {
+      const result = await predictDiseaseOffline(allShots.map((shot) => shot.dataUrl), (progress, message, details) => {
         setAnalysisProgress(progress);
         setAnalysisMessage(analysisStatus(message));
+        if (details?.previewUrl) {
+          setAnalysisPreview(details.previewUrl);
+          setAnalysisPreviewStage(details.stage || 'original');
+        }
       });
       await savePrediction({ ...record, ...result });
     } catch (error) {
@@ -206,6 +214,7 @@ function Camera() {
       });
       setCameraError(error.message);
       setSubmitting(false);
+      setAnalysisPreview(null);
       return;
     }
 
@@ -353,6 +362,18 @@ function Camera() {
 
       {submitting && (
         <div className="card">
+          {analysisPreview && (
+            <div className="analysis-vision">
+              <div className="analysis-vision-heading">
+                <span>{t('analysis_model_view')}</span>
+                <span className="analysis-vision-stage">
+                  {analysisPreviewStage === 'model_input' ? t('analysis_model_input') : t('analysis_original_image')}
+                </span>
+              </div>
+              <img src={analysisPreview} alt={t('analysis_model_view')} />
+              <p>{t('analysis_model_view_note')}</p>
+            </div>
+          )}
           <span className="status-pill status-pending pulse"><Icon name="clock" size={14} /> {analysisProgress}/100%</span>
           <p style={{ marginTop: '0.6rem' }}>{analysisMessage}</p>
           <div className="confidence-track" style={{ marginTop: '0.8rem' }}>

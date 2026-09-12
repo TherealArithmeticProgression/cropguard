@@ -49,7 +49,10 @@ function imageToTensor(image) {
     tensorData[2 * IMAGE_SIZE * IMAGE_SIZE + pixel] = ((data[pixel * 4 + 2] / 255) - IMAGENET_MEAN[2]) / IMAGENET_STD[2];
   }
 
-  return new ort.Tensor('float32', tensorData, [1, 3, IMAGE_SIZE, IMAGE_SIZE]);
+  return {
+    tensor: new ort.Tensor('float32', tensorData, [1, 3, IMAGE_SIZE, IMAGE_SIZE]),
+    previewUrl: canvas.toDataURL('image/jpeg', 0.9),
+  };
 }
 
 function softmax(values) {
@@ -82,11 +85,20 @@ export async function predictDiseaseOffline(dataUrls, onProgress = () => {}) {
 
   const predictions = [];
   for (let index = 0; index < images.length; index += 1) {
-    onProgress(20 + Math.round((index / images.length) * 55), 'Preparing the leaf image');
+    onProgress(20 + Math.round((index / images.length) * 55), 'Preparing the leaf image', {
+      previewUrl: images[index],
+      stage: 'original',
+      imageNumber: index + 1,
+    });
     const image = await loadImage(images[index]);
-    const input = imageToTensor(image);
+    const { tensor, previewUrl } = imageToTensor(image);
+    onProgress(23 + Math.round((index / images.length) * 55), 'Preparing the leaf image', {
+      previewUrl,
+      stage: 'model_input',
+      imageNumber: index + 1,
+    });
     onProgress(25 + Math.round((index / images.length) * 55), 'Reading leaf features');
-    const output = await session.run({ [inputName]: input });
+    const output = await session.run({ [inputName]: tensor });
     const outputTensor = output[session.outputNames[0]];
     const scores = Array.from(outputTensor.data).slice(0, CLASS_NAMES.length);
     if (scores.length !== CLASS_NAMES.length || scores.some((score) => !Number.isFinite(score))) {

@@ -755,6 +755,45 @@ button, input, select {
   margin-bottom: 1rem;
 }
 
+.analysis-vision {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.analysis-vision-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin-bottom: 0.6rem;
+  color: var(--vine-deep);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.analysis-vision-stage {
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.analysis-vision img {
+  display: block;
+  width: min(100%, 224px);
+  aspect-ratio: 1;
+  object-fit: cover;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  background: var(--leaf-soft);
+}
+
+.analysis-vision p {
+  margin: 0.5rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+}
+
 /* Status pills */
 .status-pill {
   display: inline-flex;
