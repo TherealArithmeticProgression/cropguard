@@ -149,7 +149,7 @@ function RiskScore() {
           </div>
           </button>
           {expanded === r.disease && (
-            <div className="disease-why">{r.explanation}</div>
+            <div className="disease-why">{t(`risk_explanation_${r.disease}`, { defaultValue: r.explanation })}</div>
           )}
         </div>
       ))}

@@ -58,7 +58,7 @@ export default function Login() {
     setMessage('');
     try {
       const result = await requestOtp(phoneNumber);
-      setMessage(result.detail || 'Verification code sent.');
+      setMessage(result.detail || t('verification_code_sent'));
       setOtpSent(true);
     } catch (error) {
       setMessage(error.message);

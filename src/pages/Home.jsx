@@ -43,7 +43,9 @@ function Home() {
     : BAND_ORDER[topRisk?.band] >= 2
       ? `${t(`disease_${topRisk.disease}`, { defaultValue: topRisk.disease })} — ${t(`risk_band_${topRisk.band}`, { defaultValue: topRisk.band })}`
       : t(`risk_band_${topRisk.band}`, { defaultValue: t('all_clear_title') });
-  const explanation = !hasRiskData ? t('risk_data_unavailable_body') : topRisk.explanation;
+  const explanation = !hasRiskData
+    ? t('risk_data_unavailable_body')
+    : t(`risk_explanation_${topRisk.disease}`, { defaultValue: topRisk.explanation });
 
   function readRisk() {
     speak(`${title}. ${explanation}`, i18n.language);
